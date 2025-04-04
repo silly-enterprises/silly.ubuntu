@@ -7,7 +7,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install tools
         run: sudo apt update && sudo apt install -y dpkg-dev
       - name: Build all packages
@@ -18,7 +18,7 @@ jobs:
           dpkg-scanpackages apt/pool /dev/null | gzip -9c > apt/dists/stable/main/binary-amd64/Packages.gz
       - name: Deploy to silly.static
         run: |
-          git clone https://github.com/silly-enterprises/silly.static
+          git clone https://github.com/silly-enterprises/static.silly.enterprises
           cd silly.static
           mkdir -p docs/apt
           cp -r ../apt/* docs/apt/
