@@ -1,0 +1,8 @@
+Package: silly-full
+Version: 0.1
+Section: metapackages
+Priority: optional
+Architecture: all
+Depends: silly-base-config, silly-small-demo
+Maintainer: The Silly Enterprises Team <team@silly.enterprises>
+Description: Meta-package for a full silly setup.

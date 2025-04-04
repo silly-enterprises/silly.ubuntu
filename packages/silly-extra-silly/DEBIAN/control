@@ -1,0 +1,8 @@
+Package: silly-extra-silly
+Version: 0.1
+Section: fun
+Priority: optional
+Architecture: all
+Depends: cowsay, fortune
+Maintainer: The Silly Enterprises Team <team@silly.enterprises>
+Description: Extra silly package for Mari's favorite fun tools.

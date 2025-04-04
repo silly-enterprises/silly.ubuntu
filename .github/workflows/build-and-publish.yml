@@ -1,0 +1,22 @@
+name: Build and Publish
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install tools
+        run: sudo apt update && sudo apt install -y dpkg-dev
+      - name: Build all packages
+        run: bash scripts/build-all.sh
+      - name: Generate package index
+        run: |
+          mkdir -p apt/dists/stable/main/binary-amd64/
+          dpkg-scanpackages apt/pool /dev/null | gzip -9c > apt/dists/stable/main/binary-amd64/Packages.gz
+      - name: Upload APT repo to Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: apt

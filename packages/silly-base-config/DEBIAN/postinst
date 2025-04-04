@@ -1,0 +1,7 @@
+#!/bin/bash
+echo "Welcome to Silly Enterprises™. Your system is now 32% sillier."
+
+for hook in /usr/share/silly-enterprises/hooks.d/*.sh; do
+	echo "Running install hook: $hook"
+	bash "$hook"
+done

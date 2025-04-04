@@ -1,0 +1,42 @@
+#!/bin/bash
+set -e
+
+show_help() {
+    cat <<EOF
+🐧  Welcome to Silly Enterprises™ OS Environment
+
+Usage:
+  silly --help        Show this help message
+  silly --version     Show installed silly components
+  silly aliases       List silly bash aliases
+  silly packages      List installed silly.* packages
+  silly fortune       Show a cow-based prophecy (if available)
+EOF
+}
+
+case "$1" in
+    --help|-h|help|"")
+        show_help
+        ;;
+    --version|-v|version)
+        echo "silly $(basename $(realpath $0)) v0.1"
+        dpkg -l | grep '^ii' | grep silly- | awk '{print "  → " $2 " " $3}'
+        ;;
+    aliases)
+        grep '^alias' /etc/bash.bashrc.d/10-silly-aliases.sh || echo "No silly aliases found."
+        ;;
+    packages)
+        dpkg-query -l 'silly-*' | awk '/^ii/ { print "  * " $2 " v" $3 }'
+        ;;
+    fortune)
+        command -v moofortune >/dev/null && moofortune || echo "moofortune is not installed."
+        ;;
+    *)
+        echo "Unknown command: $1"
+        echo
+        show_help
+        exit 1
+        ;;
+esac
+
+exit 0

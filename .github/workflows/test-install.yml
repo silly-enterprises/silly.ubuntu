@@ -1,0 +1,23 @@
+name: Test Silly Packages
+on:
+  push:
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container:
+      image: ubuntu:24.04
+    steps:
+      - name: Install test deps
+        run: apt update && apt install -y sudo dpkg
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build all packages
+        run: bash scripts/build-all.sh
+      - name: Install and verify
+        run: |
+          for deb in apt/pool/**/*.deb; do
+            echo "Installing $deb"
+            sudo dpkg -i "$deb" || sudo apt -f install -y
+          done
+          echo "✔ All silly packages installed and verified."

@@ -1,0 +1,9 @@
+Package: silly-base-config
+Version: 0.1
+Section: base
+Priority: optional
+Architecture: all
+Depends: vim, pwgen
+Maintainer: The Silly Enterprises Team <team@silly.enterprises>
+Description: Base configuration for silly Ubuntu setups
+ Includes MOTD banner, bash aliases, and common tools.

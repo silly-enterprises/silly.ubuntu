@@ -1,0 +1,8 @@
+Package: silly-small-demo
+Version: 0.1
+Section: misc
+Priority: optional
+Architecture: all
+Depends: figlet
+Maintainer: The Silly Enterprises Team <team@silly.enterprises>
+Description: A small demo package that shows a startup banner with figlet.

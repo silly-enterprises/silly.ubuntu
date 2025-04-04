@@ -1,0 +1,9 @@
+#!/usr/bin/make -f
+%:
+	dh $@
+
+override_dh_install:
+	chmod 755 debian/silly-base-config/etc/bash.bashrc.d/10-silly-aliases.sh
+    chmod 755 debian/silly-base-config/usr/local/bin/silly
+
+	dh_install

@@ -1,0 +1,7 @@
+#!/usr/bin/make -f
+%:
+	dh $@
+
+override_dh_install:
+	chmod 755 debian/silly-small-demo/etc/profile.d/silly-welcome.sh
+	dh_install
