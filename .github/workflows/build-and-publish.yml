@@ -7,7 +7,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
       - name: Install tools
         run: sudo apt update && sudo apt install -y dpkg-dev
       - name: Build all packages
@@ -16,7 +16,14 @@ jobs:
         run: |
           mkdir -p apt/dists/stable/main/binary-amd64/
           dpkg-scanpackages apt/pool /dev/null | gzip -9c > apt/dists/stable/main/binary-amd64/Packages.gz
-      - name: Upload APT repo to Pages
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: apt
+      - name: Deploy to silly.static
+        run: |
+          git clone https://github.com/silly-enterprises/silly.static
+          cd silly.static
+          mkdir -p docs/apt
+          cp -r ../apt/* docs/apt/
+          git config user.name "silly-bot[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/apt
+          git commit -m "Update APT repo from silly.ubuntu"
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/silly-enterprises/static.silly.enterprises.git HEAD:main

@@ -3,7 +3,7 @@ Version: 0.1
 Section: base
 Priority: optional
 Architecture: all
-Depends: vim, pwgen
+Depends: vim, bash-completion, curl, htop, jq, moreutils, pwgen, tree, unzip, traceroute, python3, python3-pip, python3-venv, python-is-python3, git
 Maintainer: The Silly Enterprises Team <team@silly.enterprises>
 Description: Base configuration for silly Ubuntu setups
  Includes MOTD banner, bash aliases, and common tools.
