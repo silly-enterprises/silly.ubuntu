@@ -19,7 +19,7 @@ jobs:
       - name: Deploy to silly.static
         run: |
           git clone https://github.com/silly-enterprises/static.silly.enterprises
-          cd silly.static
+          cd static.silly.enterprises
           mkdir -p docs/apt
           cp -r ../apt/* docs/apt/
           git config user.name "silly-bot[bot]"
