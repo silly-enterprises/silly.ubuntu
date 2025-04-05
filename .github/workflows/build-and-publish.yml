@@ -7,6 +7,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - id: create_token
+        uses: tibdex/github-app-token@v2
+        with:
+          app_id: ${{ vars.SILLY_ENTERPRISES_BOT_APP_ID }}
+          private_key: ${{ secrets.SILLY_ENTERPRISES_BOT_2025_04_05_PRIVATE_KEY }}
       - uses: actions/checkout@v4
       - name: Install tools
         run: sudo apt update && sudo apt install -y dpkg-dev
@@ -16,14 +21,15 @@ jobs:
         run: |
           mkdir -p apt/dists/stable/main/binary-amd64/
           dpkg-scanpackages apt/pool /dev/null | gzip -9c > apt/dists/stable/main/binary-amd64/Packages.gz
+
       - name: Deploy to silly.static
         run: |
           git clone https://github.com/silly-enterprises/static.silly.enterprises
           cd static.silly.enterprises
-          mkdir -p docs/apt
-          cp -r ../apt/* docs/apt/
-          git config user.name "silly-bot[bot]"
+          mkdir -p apt
+          cp -r ../apt/* apt/
+          git config user.name "silly enterprises bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/apt
+          git add apt
           git commit -m "Update APT repo from silly.ubuntu"
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/silly-enterprises/static.silly.enterprises.git HEAD:main
+          git push https://x-access-token:${{ steps.create_token.outputs.token }}@github.com/silly-enterprises/static.silly.enterprises.git HEAD:main

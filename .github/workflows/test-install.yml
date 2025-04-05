@@ -9,7 +9,7 @@ jobs:
       image: ubuntu:24.04
     steps:
       - name: Install test deps
-        run: apt update && apt install -y sudo dpkg
+        run: apt update && apt install -y sudo dpkg-dev
       - name: Checkout
         uses: actions/checkout@v4
       - name: Build all packages
