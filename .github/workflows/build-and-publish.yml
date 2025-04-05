@@ -26,7 +26,7 @@ jobs:
       - name: Generate package index
         run: |
           mkdir -p apt/dists/stable/main/binary-amd64/
-          dpkg-scanpackages apt/pool /dev/null | gzip -9c > apt/dists/stable/main/binary-amd64/Packages.gz
+          dpkg-scanpackages apt/pool /dev/null | tee apt/dists/stable/main/binary-amd64/Packages | gzip -9c > apt/dists/stable/main/binary-amd64/Packages.gz
 
       - name: Generate Release file with hashes
         run: |
