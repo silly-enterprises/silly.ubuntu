@@ -16,3 +16,8 @@ for pkg in packages/*; do
   fakeroot dpkg-deb --build "$pkg" "$outdir/${name}_${version}_all.deb"
 done
 echo "[silly] Done. Packages saved to apt/pool."
+
+echo "[silly] Writing dummy Release file..."
+mkdir -p apt/dists/stable
+cp scripts/Release.template apt/dists/stable/Release
+echo "done!"
