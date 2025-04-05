@@ -31,7 +31,7 @@ jobs:
       - name: Generate Release file with hashes
         run: |
           mkdir -p apt/dists/stable
-          apt-ftparchive release apt/dists/stable > apt/dists/stable/Release
+          apt-ftparchive -c scripts/apt-ftparchive.conf release apt/dists/stable > apt/dists/stable/Release
 
       - name: Import GPG key
         run: |
