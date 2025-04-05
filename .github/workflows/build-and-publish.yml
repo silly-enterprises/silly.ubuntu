@@ -57,6 +57,7 @@ jobs:
               --no-emit-version \
               -u "Silly Enterprises" \
               --clearsign apt/dists/stable/Release > apt/dists/stable/InRelease
+          mv apt/dists/stable/Release.asc apt/dists/stable/InRelease
         env:
           GPG_PASSPHRASE: ${{ secrets.SILLY_APT_REPO_GPG_PASSPHRASE }}
 
