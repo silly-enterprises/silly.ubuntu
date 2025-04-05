@@ -53,6 +53,8 @@ jobs:
         run: |
           gpg --batch --yes --pinentry-mode loopback \
               --passphrase "$GPG_PASSPHRASE" \
+              --digest-algo SHA256 \
+              --no-emit-version \
               -u "Silly Enterprises" \
               --clearsign apt/dists/stable/Release > apt/dists/stable/InRelease
         env:
