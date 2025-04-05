@@ -1,8 +1,10 @@
 name: Build and Publish
+
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -12,15 +14,50 @@ jobs:
         with:
           app_id: ${{ vars.SILLY_ENTERPRISES_BOT_APP_ID }}
           private_key: ${{ secrets.SILLY_ENTERPRISES_BOT_2025_04_05_PRIVATE_KEY }}
+
       - uses: actions/checkout@v4
+
       - name: Install tools
-        run: sudo apt update && sudo apt install -y dpkg-dev
+        run: sudo apt update && sudo apt install -y dpkg-dev gnupg
+
       - name: Build all packages
         run: bash scripts/build-all.sh
+
       - name: Generate package index
         run: |
           mkdir -p apt/dists/stable/main/binary-amd64/
           dpkg-scanpackages apt/pool /dev/null | gzip -9c > apt/dists/stable/main/binary-amd64/Packages.gz
+
+      - name: Copy Release file
+        run: |
+          mkdir -p apt/dists/stable/
+          cp scripts/Release.template apt/dists/stable/Release
+
+      - name: Import GPG key
+        run: |
+          echo "$GPG_PRIVATE_KEY" | gpg --batch --import
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.SILLY_APT_REPO_GPG_PRIVATEKEY }}
+
+      - name: Sign Release file (Release.gpg)
+        run: |
+          gpg --batch --yes --pinentry-mode loopback \
+              --passphrase "$GPG_PASSPHRASE" \
+              -u "Silly Enterprises" \
+              -o apt/dists/stable/Release.gpg \
+              -ba apt/dists/stable/Release
+        env:
+          GPG_PASSPHRASE: ${{ secrets.SILLY_APT_REPO_GPG_PASSPHRASE }}
+
+      - name: Create InRelease file
+        run: |
+          gpg --batch --yes --pinentry-mode loopback \
+              --passphrase "$GPG_PASSPHRASE" \
+              -u "Silly Enterprises" \
+              --clearsign apt/dists/stable/Release \
+              -o apt/dists/stable/InRelease
+        env:
+          GPG_PASSPHRASE: ${{ secrets.SILLY_APT_REPO_GPG_PASSPHRASE }}
 
       - name: Deploy to silly.static
         run: |
