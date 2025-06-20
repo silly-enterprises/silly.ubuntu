@@ -1,0 +1,10 @@
+{
+  "id": "aliases",
+  "label": "Enable silly aliases",
+  "files": [
+    {
+      "source": "/usr/share/sillyctl/samples/bashrc/10-silly-aliases.sh",
+      "target": "/etc/bash.bashrc.d/10-silly-aliases.sh"
+    }
+  ]
+}

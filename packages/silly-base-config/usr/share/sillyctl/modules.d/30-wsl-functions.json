@@ -1,0 +1,10 @@
+{
+  "id": "wsl-functions",
+  "label": "Enable WSL helper functions",
+  "files": [
+    {
+      "source": "/usr/share/sillyctl/samples/bashrc/20-silly-wsl-functions.sh",
+      "target": "/etc/bash.bashrc.d/20-silly-wsl-functions.sh"
+    }
+  ]
+}
