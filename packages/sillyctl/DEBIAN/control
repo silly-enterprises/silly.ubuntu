@@ -1,0 +1,11 @@
+Package: sillyctl
+Version: 0.2
+Section: admin
+Priority: optional
+Architecture: all
+Maintainer: The Gremlins Division <gremlins@silly.enterprises>
+Depends: python3, python3-textual
+Description: TUI gremlin config manager for silly.ubuntu
+ A terminal user interface (TUI) tool for enabling, disabling, and customizing
+ silly system configuration modules across various servers. Supports plug-and-play
+ module manifests and silly enterprise shenanigans.

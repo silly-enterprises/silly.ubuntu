@@ -1,9 +1,17 @@
 #!/usr/bin/make -f
+
 %:
-	dh $@
+	dh $@ --with python3
+
+override_dh_auto_build:
+	pandoc -s -t man man/silly-base-config.1.md -o debian/silly-base-config.1 || true
+
+override_dh_auto_test:
+	:
+
 
 override_dh_install:
 	chmod 755 debian/silly-base-config/etc/bash.bashrc.d/10-silly-aliases.sh
-    chmod 755 debian/silly-base-config/usr/local/bin/silly
+	chmod 755 debian/silly-base-config/etc/bash.bashrc.d/20-silly-wsl-functions.sh
 
-	dh_install
+

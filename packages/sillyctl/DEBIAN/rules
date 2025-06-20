@@ -1,0 +1,13 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@ --with python3
+
+override_dh_auto_build:
+	pandoc -s -t man man/sillyctl.1.md -o debian/sillyctl.1 || true
+
+execute_after_dh_fixperms:
+    chmod 755 debian/sillyctl/usr/share/sillyctl/sillyctl.py
+    chmod 755 debian/sillyctl/usr/local/bin/sillyctl
+
+

@@ -1,0 +1,14 @@
+{
+  "id": "motd",
+  "label": "Enable Message of the Day",
+  "files": [
+    {
+      "source": "/usr/share/sillyctl/samples/motd/banner.txt",
+      "target": "/etc/motd"
+    }
+  ],
+  "scripts": {
+    "pre_enable": "/usr/share/sillyctl/scripts/pre_enable.sh",
+    "post_enable": "/usr/share/sillyctl/scripts/post_enable.sh"
+  }
+}

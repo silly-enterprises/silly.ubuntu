@@ -1,0 +1,4 @@
+usr/share/sillyctl/sillyctl.py usr/share/sillyctl/
+usr/local/bin/sillyctl usr/local/bin/
+usr/share/sillyctl/modules.d/* usr/share/sillyctl/modules.d/
+usr/share/sillyctl/scripts/* usr/share/sillyctl/scripts/

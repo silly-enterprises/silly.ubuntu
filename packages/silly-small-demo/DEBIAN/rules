@@ -1,7 +1,10 @@
 #!/usr/bin/make -f
-%:
-	dh $@
 
-override_dh_install:
-	chmod 755 debian/silly-small-demo/etc/profile.d/silly-welcome.sh
-	dh_install
+%:
+	dh $@ --with python3
+
+override_dh_auto_build:
+	pandoc -s -t man man/silly-small-demo.1.md -o debian/silly-small-demo.1 || true
+
+override_dh_auto_test:
+	:

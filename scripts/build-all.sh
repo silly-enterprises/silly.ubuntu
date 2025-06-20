@@ -9,7 +9,7 @@ for pkg in packages/*; do
   echo "  → Building $name ($version)"
 
   # Ensure maintainer scripts are executable
-  for f in preinst postinst prerm postrm; do
+  for f in preinst postinst prerm postrm rules; do
     [ -f "$pkg/DEBIAN/$f" ] && chmod 755 "$pkg/DEBIAN/$f"
   done
 

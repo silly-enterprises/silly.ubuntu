@@ -1,0 +1,7 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: silly-full
+Source: https://github.com/silly-enterprises/silly.ubuntu
+
+Files: *
+Copyright: 2025 silly.enterprises
+License: MIT
