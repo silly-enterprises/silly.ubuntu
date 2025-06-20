@@ -15,30 +15,83 @@ Controls:
   - q or ESC to quit
 """
 
-import os
 import json
+import shutil
 import subprocess
 from pathlib import Path
+from typing import Dict, List
+import argparse
+
 from textual.app import App, ComposeResult
-from textual.widgets import Header, Footer, Checkbox, Button, Static
+from textual.widgets import Header, Footer, Checkbox, Button
 from textual.containers import Vertical
 
 CONFIG_PATH = Path("/etc/silly/sillyctl.json")
 MODULE_DIR = Path("/usr/share/sillyctl/modules.d")
 
+
+def load_manifests() -> List[Dict]:
+    modules: List[Dict] = []
+    if MODULE_DIR.exists():
+        for file in sorted(MODULE_DIR.glob("*.json")):
+            with open(file) as f:
+                modules.append(json.load(f))
+    return modules
+
+
+def load_state() -> Dict[str, bool]:
+    if CONFIG_PATH.exists():
+        with open(CONFIG_PATH) as f:
+            return json.load(f)
+    return {}
+
+
+def save_state(state: Dict[str, bool]) -> None:
+    CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with open(CONFIG_PATH, "w") as f:
+        json.dump(state, f, indent=2)
+
+
+def enable_file(src: str, dst: str) -> None:
+    if not Path(dst).exists():
+        Path(dst).parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy(src, dst)
+
+
+def disable_file(dst: str) -> None:
+    if Path(dst).exists():
+        Path(dst).unlink()
+
+
+def run_hook(script_path: str) -> None:
+    if script_path and Path(script_path).exists():
+        subprocess.run(["bash", script_path], check=False)
+
+
+def apply_module(module: Dict, enable: bool) -> None:
+    if enable:
+        run_hook(module.get("scripts", {}).get("pre_enable"))
+        for f in module.get("files", []):
+            enable_file(f["source"], f["target"])
+        run_hook(module.get("scripts", {}).get("post_enable"))
+    else:
+        for f in module.get("files", []):
+            disable_file(f["target"])
+        run_hook(module.get("scripts", {}).get("post_disable"))
+
+
+def set_state(module_id: str, enable: bool) -> None:
+    state = load_state()
+    state[module_id] = enable
+    save_state(state)
+
 class ToggleMenu(Vertical):
     def compose(self) -> ComposeResult:
         for module in SillyCtlApp.modules:
-            checked = self.get_enabled_state(module["id"])
+            checked = load_state().get(module["id"], False)
             yield Checkbox(module["label"], id=module["id"], value=checked)
         yield Button("Apply Changes", id="apply")
 
-    def get_enabled_state(self, module_id: str) -> bool:
-        if CONFIG_PATH.exists():
-            with open(CONFIG_PATH) as f:
-                state = json.load(f)
-                return state.get(module_id, False)
-        return False
 
 class SillyCtlApp(App):
     CSS_PATH = None
@@ -49,60 +102,69 @@ class SillyCtlApp(App):
 
     modules = []
 
+    def __init__(self, modules: List[Dict] | None = None) -> None:
+        super().__init__()
+        self.modules = modules or load_manifests()
+
     def compose(self) -> ComposeResult:
-        self.modules = self.load_manifests()
         yield Header("SILLYCTL v0.2 - Config Gremlin Control Panel™", show_clock=True)
         yield ToggleMenu()
         yield Footer()
-
-    def load_manifests(self):
-        modules = []
-        if MODULE_DIR.exists():
-            for file in MODULE_DIR.glob("*.json"):
-                with open(file) as f:
-                    module = json.load(f)
-                    modules.append(module)
-        return modules
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "apply":
             self.apply_changes()
 
     def apply_changes(self):
-        toggles = {}
+        toggles = load_state()
         for cb in self.query(Checkbox):
             toggles[cb.id] = cb.value
             module = next((m for m in self.modules if m["id"] == cb.id), None)
             if not module:
                 continue
 
-            if cb.value:
-                self.run_hook(module.get("scripts", {}).get("pre_enable"))
-                for f in module.get("files", []):
-                    self.enable_file(f["source"], f["target"])
-                self.run_hook(module.get("scripts", {}).get("post_enable"))
-            else:
-                for f in module.get("files", []):
-                    self.disable_file(f["target"])
-                self.run_hook(module.get("scripts", {}).get("post_disable"))
+            apply_module(module, cb.value)
 
-        CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
-        with open(CONFIG_PATH, "w") as f:
-            json.dump(toggles, f, indent=2)
+        save_state(toggles)
 
-    def enable_file(self, src: str, dst: str):
-        if not Path(dst).exists():
-            os.makedirs(os.path.dirname(dst), exist_ok=True)
-            os.system(f"cp '{src}' '{dst}'")
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Manage silly configuration modules")
+    sub = parser.add_subparsers(dest="cmd")
 
-    def disable_file(self, dst: str):
-        if Path(dst).exists():
-            os.remove(dst)
+    sub.add_parser("tui", help="launch the interactive TUI")
 
-    def run_hook(self, script_path):
-        if script_path and Path(script_path).exists():
-            subprocess.run(["bash", script_path], check=False)
+    p_enable = sub.add_parser("enable", help="enable a module")
+    p_enable.add_argument("module")
+
+    p_disable = sub.add_parser("disable", help="disable a module")
+    p_disable.add_argument("module")
+
+    sub.add_parser("list", help="list available modules")
+
+    args = parser.parse_args()
+
+    modules = load_manifests()
+
+    if args.cmd in (None, "tui"):
+        app = SillyCtlApp(modules)
+        app.run()
+        return
+
+    if args.cmd == "list":
+        state = load_state()
+        for mod in modules:
+            status = "enabled" if state.get(mod["id"], False) else "disabled"
+            print(f"{mod['id']}: {status}")
+        return
+
+    module = next((m for m in modules if m["id"] == getattr(args, 'module', '')), None)
+    if not module:
+        parser.error(f"unknown module: {getattr(args, 'module', '')}")
+
+    enable = args.cmd == "enable"
+    apply_module(module, enable)
+    set_state(module["id"], enable)
+
 
 if __name__ == "__main__":
-    app = SillyCtlApp()
-    app.run()
+    main()
