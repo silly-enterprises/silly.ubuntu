@@ -8,9 +8,10 @@
 
 # SYNOPSIS
 
-`sillyctl tui`  
-`sillyctl enable <module>`  
-`sillyctl disable <module>`  
+`sillyctl tui`
+`sillyctl enable <module>`
+`sillyctl disable <module>`
+`sillyctl list`
 
 # DESCRIPTION
 
@@ -19,3 +20,4 @@ The Config Gremlin™ helps toggle on/off various silly system-wide configuratio
 # FILES
 
 Reads modules from `/usr/share/sillyctl/modules.d/`
+Stores state in `/etc/silly/sillyctl.json`
